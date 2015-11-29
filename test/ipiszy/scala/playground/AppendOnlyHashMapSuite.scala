@@ -35,6 +35,16 @@ class AppendOnlyHashMapSuite extends FunSuite {
     assert(map.get(1) === null.asInstanceOf[String])
   }
 
+  test("Basic update and apply.") {
+    val map = new AppendOnlyHashMap[Int, String]()
+    map(12) = "ipiszy"
+    map(0) = "add"
+    assert(map.size === 2)
+    assert(map(12) === "ipiszy")
+    assert(map(0) === "add")
+    assert(map(1) === null.asInstanceOf[String])
+  }
+
   test("Null key.") {
     val map = new AppendOnlyHashMap[Int, String]()
     assert(map.get(null.asInstanceOf[Int]) === null.asInstanceOf[String])

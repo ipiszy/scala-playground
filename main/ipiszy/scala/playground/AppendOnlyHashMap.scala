@@ -79,6 +79,10 @@ class AppendOnlyHashMap[K, V](initializeSize: Int = 64)
     }
   }
 
+  def update(key: K, value: V): Unit = {
+    put(key, value)
+  }
+
   def get(key: K): V = {
     if (key == null) {
       if (hasNullKey) nullValue
@@ -88,6 +92,10 @@ class AppendOnlyHashMap[K, V](initializeSize: Int = 64)
       if (arr(idx) == null) null.asInstanceOf[V]
       else arr(idx)._2
     }
+  }
+
+  def apply(key: K): V = {
+    get(key)
   }
 
   override def size = curSize + (if (hasNullKey) 1 else 0)

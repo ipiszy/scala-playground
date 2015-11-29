@@ -21,5 +21,14 @@ object Hello extends App {
   println(a.eq(b))
   println(a.equals(null))
   println(null.eq(null))
-  println(null.equals(null))
+  try {
+    println(null.equals(null))
+  } catch {
+    case e: Exception => e.printStackTrace()
+  }
+
+  val map1 = new scala.collection.mutable.HashMap[Int, Int]()
+  map1(12) = 1200
+  map1.update(34, 10)
+  println(map1.mkString(", "))
 }
