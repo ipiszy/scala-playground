@@ -29,7 +29,7 @@ object IOKind extends Enumeration {
 }
 class FileChunk(val fileName: String, val beginOffset: Int,
                 val endOffset: Int) {
-  def this() = {this("", 0, 0)}
+  // def this() = {this("", 0, 0)}
   override def toString() = fileName + ":" + beginOffset.toString + ":" +
     endOffset.toString
   override def equals(other: Any) = {
@@ -41,7 +41,7 @@ class FileChunk(val fileName: String, val beginOffset: Int,
 }
 class FileInputSpec(val fileChunks: Array[FileChunk],
                     val fileFormat: FileFormat.Value) {
-  def this() = {this(null, FileFormat.TEXT)}
+  // def this() = {this(null, FileFormat.TEXT)}
   override def toString() = "FileChunks: [" + fileChunks.mkString(", ") + "]," +
     ", FileFormat: " + fileFormat.toString
 
@@ -59,7 +59,7 @@ class FileInputSpec(val fileChunks: Array[FileChunk],
 class MemInputSpec(val internalArray: Array[Array[Array[Byte]]],
                    val currentInstanceId: Int,
                    val inputInstanceNum: Int) {
-  def this() = {this(null, 0, 0)}
+  // def this() = {this(null, 0, 0)}
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[MemInputSpec]
 
@@ -76,25 +76,27 @@ class MemInputSpec(val internalArray: Array[Array[Array[Byte]]],
 class FileOutputSpec(val filePrefix: String,
                      val currentInstanceId: Int,
                      val outputInstanceNum: Int,
-                     val fileFormat: FileFormat.Value) {
-  def this() = {this("", 0, 0, FileFormat.TEXT)}
-}
+                     val fileFormat: FileFormat.Value) {}
 class MemOutputSpec(val internalArray: Array[Array[Array[Byte]]],
                     val currentInstanceId: Int,
-                    val outputInstanceNum: Int,
-                    val partitionMethod: PartitionMethod.Value) {
-  def this() = {this(null, 0, 0, PartitionMethod.SHUFFLE)}
-}
+                    val outputInstanceNum: Int) {}
 
-class InputSpec(val memInputSpec: MemInputSpec,
-                val fileInput: FileInputSpec) {
+object InputMethod extends Enumeration {
+  val SINGLE = Value
+  val SORT = Value
+}
+class InputSpec private(val memInputSpec: MemInputSpec,
+                        val fileInput: Array[FileInputSpec],
+                        val inputMethod: InputMethod.Value) {
   private var source: IOKind.Value = IOKind.FILE
-  def this(memInputSpec: MemInputSpec) = {
-    this(memInputSpec, new FileInputSpec())
+  def this(memInputSpec: MemInputSpec,
+           inputMethod: InputMethod.Value) = {
+    this(memInputSpec, null, inputMethod)
     source = IOKind.MEMORY
   }
-  def this(fileInputSpec: FileInputSpec) = {
-    this(new MemInputSpec(), fileInputSpec)
+  def this(fileInputSpec: Array[FileInputSpec],
+           inputMethod: InputMethod.Value) = {
+    this(null, fileInputSpec, inputMethod)
     source = IOKind.FILE
   }
   override def toString() = "MemInputSpec: " + memInputSpec.toString + "\n" +
@@ -110,15 +112,23 @@ class InputSpec(val memInputSpec: MemInputSpec,
   }
 }
 
-class OutputSpec(val memOutputSpec: MemOutputSpec,
-                 val fileOutput: FileOutputSpec) {
+object OutputMethod extends Enumeration {
+  val SINGLE = Value
+  val HASH = Value
+  val HASH_AND_SORT = Value
+}
+class OutputSpec private(val memOutputSpec: MemOutputSpec,
+                         val fileOutput: Array[FileOutputSpec],
+                         val outputMethod: OutputMethod.Value) {
   private var source: IOKind.Value = IOKind.FILE
-  def this(memOutputSpec: MemOutputSpec) = {
-    this(memOutputSpec, new FileOutputSpec())
+  def this(memOutputSpec: MemOutputSpec,
+           outputMethod: OutputMethod.Value) = {
+    this(memOutputSpec, null, outputMethod)
     source = IOKind.MEMORY
   }
-  def this(fileOutput: FileOutputSpec) = {
-    this(new MemOutputSpec(), fileOutput)
+  def this(fileOutput: Array[FileOutputSpec],
+           outputMethod: OutputMethod.Value) = {
+    this(null, fileOutput, outputMethod)
     source = IOKind.FILE
   }
   def getKind = source

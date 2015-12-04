@@ -18,22 +18,23 @@ class MapReduceController(val spec: MapReduceSpec) {
     for (i <- 0 until spec.numMapper) {
       result(i) = new RunnerSpec(
         inputSpecs(i),
-        new OutputSpec(new MemOutputSpec(
-          mrInternalData, i, spec.numReducer, PartitionMethod.SHUFFLE)),
-          spec.mapperClass, i)
+        new OutputSpec(new MemOutputSpec(mrInternalData, i, spec.numReducer),
+                       OutputMethod.HASH_AND_SORT),
+        spec.mapperClass, i)
     }
     result
   }
 
   private def genReducerSpec(spec: MapReduceSpec): Array[RunnerSpec] = {
     val result = new Array[RunnerSpec](spec.numReducer)
-    val inputSpecs = IOAdapter.newIOAdapter(IOKind.FILE, spec.input.format)
-      .splitInput(spec.input, spec.numMapper)
     for (i <- 0 until spec.numMapper) {
       result(i) = new RunnerSpec(
-        new InputSpec(new MemInputSpec(mrInternalData, i, spec.numMapper)),
-        new OutputSpec(new FileOutputSpec(
-          spec.output.filePrefix, i, spec.numReducer, spec.output.format)),
+        new InputSpec(new MemInputSpec(mrInternalData, i, spec.numMapper),
+                      InputMethod.SORT),
+        new OutputSpec(
+          Array(new FileOutputSpec(spec.output.filePrefix, i, spec.numReducer,
+                                   spec.output.format)),
+          OutputMethod.SINGLE),
         spec.reducerClass, i)
     }
     result

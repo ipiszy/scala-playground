@@ -28,6 +28,7 @@ trait IOAdapter {
     val lengthUnit =
       if (length / IOAdapter.MIN_UNIT < numInstance) IOAdapter.MIN_UNIT
       else length / numInstance + length % numInstance
+
     // Split files into file chunks.
     val result = new Array[InputSpec](numInstance)
     it = Files.newDirectoryStream(Paths.get(dir)).iterator()
@@ -40,8 +41,9 @@ trait IOAdapter {
       while (file.length() - beginOffset >= remainingOffset) {
         fileChunks += new FileChunk(file.getAbsolutePath, beginOffset,
           beginOffset + remainingOffset)
-        result(i) = new InputSpec(new FileInputSpec(fileChunks.toArray,
-          mrInputSpec.format))
+        result(i) = new InputSpec(
+          Array(new FileInputSpec(fileChunks.toArray, mrInputSpec.format)),
+          InputMethod.SINGLE)
         i += 1
         fileChunks = new ArrayBuffer[FileChunk]()
         beginOffset += remainingOffset
@@ -54,13 +56,16 @@ trait IOAdapter {
       }
       beginOffset = 0
     }
-    if (!fileChunks.isEmpty) result(i) = new InputSpec(
-      new FileInputSpec(fileChunks.toArray, mrInputSpec.format))
+    if (!fileChunks.isEmpty) {
+      result(i) = new InputSpec(
+        Array(new FileInputSpec(fileChunks.toArray, mrInputSpec.format)),
+        InputMethod.SINGLE)
+    }
     result
   }
 
-  def source(spec: InputSpec): Source
-  def sink(spec: OutputSpec): Sink
+//  def source(spec: InputSpec): Source
+//  def sink(spec: OutputSpec): Sink
 }
 
 object IOAdapter {

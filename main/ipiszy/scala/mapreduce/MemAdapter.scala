@@ -5,9 +5,12 @@ import java.io._
 /**
   * Created by carolzhang on 11/30/15.
   */
-class MemSource(val memInputSpec: MemInputSpec) extends Source {
-  private var idx = 0
-  private var objectIS: ObjectInputStream = null
+class MemSource(val internalArray: Array[Array[Array[Byte]]],
+                val currentInstanceId: Int,
+                val inputInstanceId: Int) extends Source {
+  private val objectIS: ObjectInputStream =
+    new ObjectInputStream(new ByteArrayInputStream(
+      internalArray(currentInstanceId)(inputInstanceId)))
 
   override def readNextValue(): Array[Byte] = {
     assert(false, "Unimplemented method!")
@@ -15,11 +18,6 @@ class MemSource(val memInputSpec: MemInputSpec) extends Source {
   }
 
   override def readNextKV(): (Array[Byte], Array[Byte]) = {
-    if (idx >= memInputSpec.inputInstanceNum) return null
-    if (objectIS == null) {
-      objectIS = new ObjectInputStream(new ByteArrayInputStream(
-        memInputSpec.internalArray(memInputSpec.currentInstanceId)(idx)))
-    }
     try {
       val key = objectIS.readObject().asInstanceOf[Array[Byte]]
       val value = objectIS.readObject().asInstanceOf[Array[Byte]]
@@ -27,42 +25,38 @@ class MemSource(val memInputSpec: MemInputSpec) extends Source {
     } catch {
       case _: EOFException => {
         objectIS.close()
-        idx += 1
-        readNextKV()
+        null
       }
     }
   }
-
 }
 
-class MemSink(val memOutputSpec: MemOutputSpec) extends Sink {
-  private val byteArrayOS = new Array[ByteArrayOutputStream](
-    memOutputSpec.outputInstanceNum)
-  private val objectOS = new Array[ObjectOutputStream](
-    memOutputSpec.outputInstanceNum)
-  for (i <- 0 until objectOS.length) {
-    byteArrayOS(i) = new ByteArrayOutputStream()
-    objectOS(i) = new ObjectOutputStream(byteArrayOS(i))
-  }
+class MemSink(val internalArray: Array[Array[Array[Byte]]],
+              val currentInstanceId: Int,
+              val outputInstanceId: Int) extends Sink {
+  private val byteArrayOS = new ByteArrayOutputStream()
+  private val objectOS = new ObjectOutputStream(byteArrayOS)
 
-  override def writeKV(key: Array[Byte], value: Array[Byte]): Unit = {
-    val idx = key.hashCode() % memOutputSpec.outputInstanceNum
-    objectOS(idx).writeObject(key)
-    objectOS(idx).writeObject(value)
+  override def writeKV(kv: (Array[Byte], Array[Byte])): Unit = {
+    objectOS.writeObject(kv._1)
+    objectOS.writeObject(kv._2)
   }
 
   override def close(): Unit = {
-    for (i <- 0 until objectOS.length) {
-      objectOS(i).flush()
-      memOutputSpec.internalArray(memOutputSpec.currentInstanceId)(i) =
-        byteArrayOS(i).toByteArray
-      objectOS(i).close()
-    }
+    objectOS.flush()
+    internalArray(outputInstanceId)(currentInstanceId) = byteArrayOS.toByteArray
+    objectOS.close()
   }
 
 }
 
 class MemAdapter extends IOAdapter {
+  override def splitInput(mrInputSpec: MapReduceInputSpec,
+                          numInstance: Int): Array[InputSpec] = {
+    assert(false, "Unimplemented method!")
+    null
+  }
+  /*
   override def source(spec: InputSpec): Source = {
     assert(spec.getKind == IOKind.MEMORY)
     new MemSource(spec.memInputSpec)
@@ -72,4 +66,5 @@ class MemAdapter extends IOAdapter {
     assert(spec.getKind == IOKind.MEMORY)
     new MemSink(spec.memOutputSpec)
   }
+  */
 }
