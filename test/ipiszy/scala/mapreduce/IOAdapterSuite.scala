@@ -18,7 +18,7 @@ class IOAdapterSuite extends FunSuite {
     val result = textFileAdapter.splitInput(input, 1)
     assert(result.length === 1)
     assert(result(0).getKind === IOKind.FILE)
-    assert(result(0).fileInput.fileChunks === Array[FileChunk](
+    assert(result(0).fileInput(0).fileChunks === Array[FileChunk](
       new FileChunk(new File(dataDir + "1.txt").getAbsolutePath, 0, 1),
       new FileChunk(new File(dataDir + "2.txt").getAbsolutePath, 0, 3),
       new FileChunk(new File(dataDir + "4.txt").getAbsolutePath, 0, 7)
@@ -29,14 +29,14 @@ class IOAdapterSuite extends FunSuite {
     val result = textFileAdapter.splitInput(input, 2)
     assert(result.length === 2)
     assert(result(0).getKind === IOKind.FILE)
-    assert(result(0).fileInput.fileChunks === Array[FileChunk](
+    assert(result(0).fileInput(0).fileChunks === Array[FileChunk](
       new FileChunk(new File(dataDir + "1.txt").getAbsolutePath, 0, 1),
       new FileChunk(new File(dataDir + "2.txt").getAbsolutePath, 0, 3),
       new FileChunk(new File(dataDir + "4.txt").getAbsolutePath, 0, 2)
     ))
     assert(result(1).getKind === IOKind.FILE)
-    assert(result(1).fileInput.fileChunks === Array[FileChunk](
-      new FileChunk(new File(dataDir + "4.txt").getAbsolutePath, 2, 7)
+    assert(result(1).fileInput(0).fileChunks === Array[FileChunk](
+        new FileChunk(new File(dataDir + "4.txt").getAbsolutePath, 2, 7)
     ))
   }
 
@@ -46,13 +46,14 @@ class IOAdapterSuite extends FunSuite {
     var last = 0
     for (i <- 0 until 11) {
       assert(result(i).getKind === IOKind.FILE)
-      assert(result(i).fileInput.fileChunks.length === 1)
-      assert(result(i).fileInput.fileChunks(0).endOffset ===
-        result(i).fileInput.fileChunks(0).beginOffset + 1)
-      if (result(i).fileInput.fileChunks(0).beginOffset != 0) {
-        assert(result(i).fileInput.fileChunks(0).beginOffset === last)
+      assert(result(i).fileInput.length === 1)
+      assert(result(i).fileInput(0).fileChunks.length === 1)
+      assert(result(i).fileInput(0).fileChunks(0).endOffset ===
+        result(i).fileInput(0).fileChunks(0).beginOffset + 1)
+      if (result(i).fileInput(0).fileChunks(0).beginOffset != 0) {
+        assert(result(i).fileInput(0).fileChunks(0).beginOffset === last)
       }
-      last = result(i).fileInput.fileChunks(0).endOffset
+      last = result(i).fileInput(0).fileChunks(0).endOffset
     }
     for (i <- 11 until 100) assert(result(i) === null)
   }

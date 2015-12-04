@@ -29,11 +29,6 @@ class TextFileSource(val fileChunks: Array[FileChunk]) extends Source {
       file.readLine().getBytes()
     }
   }
-
-  override def readNextKV(): (Array[Byte], Array[Byte]) = {
-    assert(false, "This method hasn't been implemented yet!")
-    (null, null)
-  }
 }
 
 class TextFileSink(val filePrefix: String,
@@ -41,7 +36,7 @@ class TextFileSink(val filePrefix: String,
                    val outputInstanceNum: Int) extends Sink {
   val fileName = filePrefix + "-" + currentInstanceId + "-of-" +
     outputInstanceNum
-  val file = new RandomAccessFile(fileName, "w")
+  val file = new RandomAccessFile(fileName, "rw")
 
   override def writeKV(kv: (Array[Byte], Array[Byte])): Unit = {
     file.write(kv._1)

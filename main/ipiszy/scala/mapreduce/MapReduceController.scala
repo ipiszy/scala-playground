@@ -1,5 +1,7 @@
 package ipiszy.scala.mapreduce
 
+import java.io.File
+import java.nio.file.{FileAlreadyExistsException, Files, Paths}
 import java.util.concurrent.{TimeUnit, Executors}
 
 /**
@@ -54,6 +56,16 @@ class MapReduceController(val spec: MapReduceSpec) {
     mappers.shutdown()
     while (!mappers.awaitTermination(1, TimeUnit.MINUTES)) {
       println("Waiting for mappers to complete.")
+    }
+    val outputDir = Paths.get(new File(spec.output.filePrefix).getParent)
+    println("Creating output directory: " + outputDir + ".")
+    try {
+      Files.createDirectory(outputDir)
+      println("The output directory was created successfully.")
+    } catch {
+      case _: FileAlreadyExistsException => {
+        println("Output directory already exists.")
+      }
     }
     println("Start reducers.")
     val reducers = Executors.newFixedThreadPool(spec.numReducer)

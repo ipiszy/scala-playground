@@ -50,7 +50,7 @@ class FileInputSpec(val fileChunks: Array[FileChunk],
   override def equals(other: Any): Boolean = other match {
     case that: FileInputSpec =>
       (that canEqual this) &&
-        fileChunks == that.fileChunks &&
+        fileChunks.equals(that.fileChunks) &&
         fileFormat == that.fileFormat
     case _ => false
   }

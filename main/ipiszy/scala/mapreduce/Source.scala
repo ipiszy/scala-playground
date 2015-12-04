@@ -6,8 +6,18 @@ import scala.collection.mutable.ArrayBuffer
   * Created by carolzhang on 11/30/15.
   */
 trait Source {
-  def readNextValue(): Array[Byte]
-  def readNextKV(): (Array[Byte], Array[Byte])
+  def readNextValue(): Array[Byte] = {
+    assert(false, "Unsupported method!")
+    null
+  }
+  def readNextKV(): (Array[Byte], Array[Byte]) = {
+    assert(false, "Unsupported method!")
+    null
+  }
+  def readNextKVs(): (Array[Byte], Array[Array[Byte]]) = {
+    assert(false, "Unsupported method!")
+    null
+  }
 }
 
 object Source {

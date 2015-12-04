@@ -12,11 +12,6 @@ class MemSource(val internalArray: Array[Array[Array[Byte]]],
     new ObjectInputStream(new ByteArrayInputStream(
       internalArray(currentInstanceId)(inputInstanceId)))
 
-  override def readNextValue(): Array[Byte] = {
-    assert(false, "Unimplemented method!")
-    null
-  }
-
   override def readNextKV(): (Array[Byte], Array[Byte]) = {
     try {
       val key = objectIS.readObject().asInstanceOf[Array[Byte]]

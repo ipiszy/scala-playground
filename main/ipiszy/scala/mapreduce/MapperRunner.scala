@@ -13,9 +13,10 @@ class MapperRunner(val mapperSpec: RunnerSpec) extends Runnable {
     println("Starting mapper #" + mapperSpec.instanceId + ".")
     var inputValue = input.readNextValue()
     while (inputValue != null) {
-      output.writeKV(mapper.map(inputValue))
+      mapper.map(inputValue).foreach(output.writeKV(_))
       inputValue = input.readNextValue()
     }
+    output.close()
     println("Mapper #" + mapperSpec.instanceId + " has completed!")
   }
 }
