@@ -1,6 +1,7 @@
 package ipiszy.scala.mapreduce
 
 import java.io.RandomAccessFile
+import java.nio.file.{Paths, Files}
 
 /**
   * Created by carolzhang on 11/30/15.
@@ -36,6 +37,7 @@ class TextFileSink(val filePrefix: String,
                    val outputInstanceNum: Int) extends Sink {
   val fileName = filePrefix + "-" + currentInstanceId + "-of-" +
     outputInstanceNum
+  Files.deleteIfExists(Paths.get(fileName))
   val file = new RandomAccessFile(fileName, "rw")
 
   override def writeKV(kv: (Array[Byte], Array[Byte])): Unit = {

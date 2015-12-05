@@ -13,7 +13,7 @@ object MaxInASlidingWindow extends App {
       "The current windowSize: " + windowSize)
     val result = new Array[Int](arr.length)
     val history = new util.LinkedList[Int]()
-    for (i <- 0 until arr.length) {
+    for (i <- arr.indices) {
       if (!history.isEmpty && history.getFirst + windowSize == i) history.removeFirst()
       val it = history.descendingIterator()
       while (it.hasNext && arr(it.next()) <= arr(i)) {

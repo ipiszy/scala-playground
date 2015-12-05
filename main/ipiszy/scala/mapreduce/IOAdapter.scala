@@ -56,7 +56,7 @@ trait IOAdapter {
       }
       beginOffset = 0
     }
-    if (!fileChunks.isEmpty) {
+    if (fileChunks.nonEmpty) {
       result(i) = new InputSpec(
         Array(new FileInputSpec(fileChunks.toArray, mrInputSpec.format)),
         InputMethod.SINGLE)

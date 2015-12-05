@@ -30,7 +30,7 @@ object IOKind extends Enumeration {
 class FileChunk(val fileName: String, val beginOffset: Int,
                 val endOffset: Int) {
   // def this() = {this("", 0, 0)}
-  override def toString() = fileName + ":" + beginOffset.toString + ":" +
+  override def toString = fileName + ":" + beginOffset.toString + ":" +
     endOffset.toString
   override def equals(other: Any) = {
     val that = other.asInstanceOf[FileChunk]
@@ -42,7 +42,7 @@ class FileChunk(val fileName: String, val beginOffset: Int,
 class FileInputSpec(val fileChunks: Array[FileChunk],
                     val fileFormat: FileFormat.Value) {
   // def this() = {this(null, FileFormat.TEXT)}
-  override def toString() = "FileChunks: [" + fileChunks.mkString(", ") + "]," +
+  override def toString = "FileChunks: [" + fileChunks.mkString(", ") + "]," +
     ", FileFormat: " + fileFormat.toString
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[FileInputSpec]
@@ -50,7 +50,7 @@ class FileInputSpec(val fileChunks: Array[FileChunk],
   override def equals(other: Any): Boolean = other match {
     case that: FileInputSpec =>
       (that canEqual this) &&
-        fileChunks.equals(that.fileChunks) &&
+        fileChunks.sameElements(that.fileChunks) &&
         fileFormat == that.fileFormat
     case _ => false
   }
@@ -66,7 +66,7 @@ class MemInputSpec(val internalArray: Array[Array[Array[Byte]]],
   override def equals(other: Any): Boolean = other match {
     case that: MemInputSpec =>
       (that canEqual this) &&
-        internalArray == that.internalArray &&
+        (internalArray sameElements that.internalArray) &&
         currentInstanceId == that.currentInstanceId &&
         inputInstanceNum == that.inputInstanceNum
     case _ => false
@@ -99,7 +99,7 @@ class InputSpec private(val memInputSpec: MemInputSpec,
     this(null, fileInputSpec, inputMethod)
     source = IOKind.FILE
   }
-  override def toString() = "MemInputSpec: " + memInputSpec.toString + "\n" +
+  override def toString = "MemInputSpec: " + memInputSpec.toString + "\n" +
     "FileInputSpec: " + fileInput
 
   def getKind = source
@@ -108,7 +108,7 @@ class InputSpec private(val memInputSpec: MemInputSpec,
     val that = other.asInstanceOf[InputSpec]
     if (that == null) false
     else source.equals(that.source) && memInputSpec.equals(that.memInputSpec) &&
-      fileInput.equals(that.fileInput)
+      fileInput.sameElements(that.fileInput)
   }
 }
 

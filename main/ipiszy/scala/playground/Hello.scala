@@ -11,7 +11,7 @@ import scala.util.Sorting
   * Created by carolzhang on 11/28/15.
   */
 class A {
-  def helloWorld {println("Hello world A")}
+  def helloWorld() {println("Hello world A")}
 }
 
 class B extends A {

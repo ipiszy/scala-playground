@@ -29,7 +29,7 @@ class MapReduceController(val spec: MapReduceSpec) {
 
   private def genReducerSpec(spec: MapReduceSpec): Array[RunnerSpec] = {
     val result = new Array[RunnerSpec](spec.numReducer)
-    for (i <- 0 until spec.numMapper) {
+    for (i <- 0 until spec.numReducer) {
       result(i) = new RunnerSpec(
         new InputSpec(new MemInputSpec(mrInternalData, i, spec.numMapper),
                       InputMethod.SORT),

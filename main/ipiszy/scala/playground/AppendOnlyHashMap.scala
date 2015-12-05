@@ -10,7 +10,7 @@ import java.util.NoSuchElementException
   *   3. Use anonymous internal class to write iterator.
   *   4. Iterator.next() should throw exception upon fail.
   *   5. The difference between eq and equals? AnyRef.eq and AnyRef.equals?
-  *   6. a % b operation. If b == 2^n, then a % b = a & (b - 1)?
+  *   6. a % b operation. If b == 2&#94;n, then a % b = a & (b - 1)?
   */
 
 class AppendOnlyHashMap[K, V](initializeSize: Int = 64)
@@ -60,7 +60,7 @@ class AppendOnlyHashMap[K, V](initializeSize: Int = 64)
     if (curSize > arr.length * LOAD_FACTOR) {
       val nextSize = arr.length << 1
       require(nextSize <= AppendOnlyHashMap.MAX_SIZE,
-        "The hashmap contains too many elements. Max capacity: " +
+        "The hash map contains too many elements. Max capacity: " +
         AppendOnlyHashMap.MAX_SIZE * LOAD_FACTOR +
         ", current number of elements: " + curSize)
       val newArr = new Array[(K, V)](nextSize)
