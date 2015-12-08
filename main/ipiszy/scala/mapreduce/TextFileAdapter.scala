@@ -1,6 +1,6 @@
 package ipiszy.scala.mapreduce
 
-import java.io.RandomAccessFile
+import java.io.{PrintWriter, FileWriter, RandomAccessFile}
 import java.nio.file.{Paths, Files}
 
 /**
@@ -38,13 +38,10 @@ class TextFileSink(val filePrefix: String,
   val fileName = filePrefix + "-" + currentInstanceId + "-of-" +
     outputInstanceNum
   Files.deleteIfExists(Paths.get(fileName))
-  val file = new RandomAccessFile(fileName, "rw")
+  val file = new PrintWriter(fileName)
 
   override def writeKV(kv: (Array[Byte], Array[Byte])): Unit = {
-    file.write(kv._1)
-    file.writeChar(':')
-    file.write(kv._2)
-    file.writeChar('\n')
+    file.println(new String(kv._1) + " : " + new String(kv._2))
   }
 
   override def close(): Unit = {

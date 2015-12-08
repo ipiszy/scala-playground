@@ -11,12 +11,16 @@ class MapperRunner(val mapperSpec: RunnerSpec) extends Runnable {
 
   override def run(): Unit = {
     println("Starting mapper #" + mapperSpec.instanceId + ".")
-    var inputValue = input.readNextValue()
-    while (inputValue != null) {
-      mapper.map(inputValue).foreach(output.writeKV)
-      inputValue = input.readNextValue()
+    try {
+      var inputValue = input.readNextValue()
+      while (inputValue != null) {
+        val mapResults = mapper.map(inputValue)
+        if (mapResults != null) mapResults.foreach(output.writeKV)
+        inputValue = input.readNextValue()
+      }
+    } finally {
+      output.close()
     }
-    output.close()
     println("Mapper #" + mapperSpec.instanceId + " has completed!")
   }
 }

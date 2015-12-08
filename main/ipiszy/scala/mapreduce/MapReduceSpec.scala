@@ -29,19 +29,17 @@ object IOKind extends Enumeration {
 }
 class FileChunk(val fileName: String, val beginOffset: Int,
                 val endOffset: Int) {
-  // def this() = {this("", 0, 0)}
   override def toString = fileName + ":" + beginOffset.toString + ":" +
     endOffset.toString
   override def equals(other: Any) = {
     val that = other.asInstanceOf[FileChunk]
     if (that == null) false
-    else fileName.equals(that.fileName) && beginOffset == that.beginOffset &&
+    else fileName == that.fileName && beginOffset == that.beginOffset &&
       endOffset == that.endOffset
   }
 }
 class FileInputSpec(val fileChunks: Array[FileChunk],
                     val fileFormat: FileFormat.Value) {
-  // def this() = {this(null, FileFormat.TEXT)}
   override def toString = "FileChunks: [" + fileChunks.mkString(", ") + "]," +
     ", FileFormat: " + fileFormat.toString
 
@@ -59,7 +57,6 @@ class FileInputSpec(val fileChunks: Array[FileChunk],
 class MemInputSpec(val internalArray: Array[Array[Array[Byte]]],
                    val currentInstanceId: Int,
                    val inputInstanceNum: Int) {
-  // def this() = {this(null, 0, 0)}
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[MemInputSpec]
 
@@ -87,17 +84,15 @@ object InputMethod extends Enumeration {
 }
 class InputSpec private(val memInputSpec: MemInputSpec,
                         val fileInput: Array[FileInputSpec],
-                        val inputMethod: InputMethod.Value) {
-  private var source: IOKind.Value = IOKind.FILE
+                        val inputMethod: InputMethod.Value,
+                        private val source: IOKind.Value) {
   def this(memInputSpec: MemInputSpec,
            inputMethod: InputMethod.Value) = {
-    this(memInputSpec, null, inputMethod)
-    source = IOKind.MEMORY
+    this(memInputSpec, null, inputMethod, IOKind.MEMORY)
   }
   def this(fileInputSpec: Array[FileInputSpec],
            inputMethod: InputMethod.Value) = {
-    this(null, fileInputSpec, inputMethod)
-    source = IOKind.FILE
+    this(null, fileInputSpec, inputMethod, IOKind.FILE)
   }
   override def toString = "MemInputSpec: " + memInputSpec.toString + "\n" +
     "FileInputSpec: " + fileInput

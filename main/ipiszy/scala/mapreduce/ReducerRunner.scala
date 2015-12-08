@@ -11,13 +11,16 @@ class ReducerRunner(val reducerSpec: RunnerSpec) extends Runnable {
 
   override def run(): Unit = {
     println("Starting reducer #" + reducerSpec.instanceId + ".")
-    var inputKVs = input.readNextKVs()
-    while (inputKVs != null) {
-      val result = reducer.reduce(inputKVs._1, inputKVs._2)
-      if (result != null) output.writeKV(result)
-      inputKVs = input.readNextKVs()
+    try {
+      var inputKVs = input.readNextKVs()
+      while (inputKVs != null) {
+        val result = reducer.reduce(inputKVs._1, inputKVs._2)
+        if (result != null) output.writeKV(result)
+        inputKVs = input.readNextKVs()
+      }
+    } finally {
+      output.close()
     }
-    output.close()
     println("Reducer #" + reducerSpec.instanceId + " has completed!")
   }
 

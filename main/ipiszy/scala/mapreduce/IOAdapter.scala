@@ -17,21 +17,21 @@ trait IOAdapter {
     val name = filePattern.getName
     var it = Files.newDirectoryStream(Paths.get(dir), name).iterator()
     // Get the total length of files.
-    var length = 0
+    var length = 0L
     while (it.hasNext) {
       val file = it.next().toFile
       require(file.isFile,
         "The pattern does not match a file: " + file.getAbsolutePath)
-      length += file.length().toInt
+      length += file.length()
     }
     // Get the length for each map shard.
     val lengthUnit =
       if (length / IOAdapter.MIN_UNIT < numInstance) IOAdapter.MIN_UNIT
-      else length / numInstance + length % numInstance
+      else (length / numInstance + length % numInstance).toInt
 
     // Split files into file chunks.
     val result = new Array[InputSpec](numInstance)
-    it = Files.newDirectoryStream(Paths.get(dir)).iterator()
+    it = Files.newDirectoryStream(Paths.get(dir), name).iterator()
     var beginOffset = 0
     var remainingOffset = lengthUnit
     var fileChunks = new ArrayBuffer[FileChunk]()
@@ -63,9 +63,6 @@ trait IOAdapter {
     }
     result
   }
-
-//  def source(spec: InputSpec): Source
-//  def sink(spec: OutputSpec): Sink
 }
 
 object IOAdapter {

@@ -50,12 +50,15 @@ class MapReduceController(val spec: MapReduceSpec) {
   def start(): Unit = {
     println("Start mappers.")
     val mappers = Executors.newFixedThreadPool(spec.numMapper)
-    for (mapperSpec <- mapperSpecs) {
-      mappers.execute(new MapperRunner(mapperSpec))
-    }
-    mappers.shutdown()
-    while (!mappers.awaitTermination(1, TimeUnit.MINUTES)) {
-      println("Waiting for mappers to complete.")
+    try {
+      for (mapperSpec <- mapperSpecs) {
+        mappers.execute(new MapperRunner(mapperSpec))
+      }
+    } finally {
+      mappers.shutdown()
+      while (!mappers.awaitTermination(1, TimeUnit.MINUTES)) {
+        println("Waiting for mappers to complete.")
+      }
     }
     val outputDir = Paths.get(new File(spec.output.filePrefix).getParent)
     println("Creating output directory: " + outputDir + ".")
@@ -69,12 +72,15 @@ class MapReduceController(val spec: MapReduceSpec) {
     }
     println("Start reducers.")
     val reducers = Executors.newFixedThreadPool(spec.numReducer)
-    for (reducerSpec <- reducerSpecs) {
-      reducers.execute(new ReducerRunner(reducerSpec))
-    }
-    reducers.shutdown()
-    while (!reducers.awaitTermination(1, TimeUnit.MINUTES)) {
-      println("Waiting for reducers to complete.")
+    try {
+      for (reducerSpec <- reducerSpecs) {
+        reducers.execute(new ReducerRunner(reducerSpec))
+      }
+    } finally {
+      reducers.shutdown()
+      while (!reducers.awaitTermination(1, TimeUnit.MINUTES)) {
+        println("Waiting for reducers to complete.")
+      }
     }
     println("Completed.")
   }
